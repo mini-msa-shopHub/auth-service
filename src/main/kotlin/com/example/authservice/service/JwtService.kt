@@ -60,6 +60,7 @@ class JwtService(
     private fun createAccessToken(email: String): String {
         val now = Date()
         return JWT.create()
+            .withIssuer("admin")
             .withSubject(ACCESS_TOKEN_SUBJECT)
             .withExpiresAt(Date(now.time + accessTokenExpirationPeriod))
             .withClaim(EMAIL_CLAIM, email)
@@ -93,11 +94,14 @@ class JwtService(
     fun extractEmail(token: String?): String? {
         return try {
             JWT.require(Algorithm.HMAC512(secretKey))
+                .withIssuer("admin")
                 .build()
                 .verify(token)
                 .getClaim(EMAIL_CLAIM)
                 .asString()
         } catch (e: Exception) {
+            println(e.message)
+            println(e.cause)
             null
         }
     }
@@ -122,6 +126,19 @@ class JwtService(
         } catch (e: JWTVerificationException) {
             logger.info("토큰 문제")
             false
+        }
+    }
+
+    fun decodeToken(token: String): String? {
+        return try {
+            JWT.require(Algorithm.HMAC512(secretKey))
+                .withIssuer("admin")
+                .build()
+                .verify(token)
+                .getClaim(EMAIL_CLAIM)
+                .asString()
+        } catch (e: Exception) {
+            null
         }
     }
 

@@ -1,6 +1,7 @@
 package com.example.authservice.controller
 
 import com.example.authservice.dto.LoginRequest
+import com.example.authservice.dto.PassportDto
 import com.example.authservice.dto.PasswordDto
 import com.example.authservice.dto.TokenResponse
 import com.example.authservice.service.JwtService
@@ -31,6 +32,7 @@ class AuthController(
     fun login(@RequestBody loginRequest: LoginRequest): CommonResponse<TokenResponse> {
         val authenticationToken = loginRequest.toAuthenticationToken()
         val authentication = authenticationManager.authenticate(authenticationToken)
+        println(authentication.name)
         return CommonResponse(jwtService.makeTokenResponse(authentication.name))
     }
 
@@ -55,6 +57,14 @@ class AuthController(
     @GetMapping("/check-token/{token}")
     fun checkToken(@PathVariable("token") token: String): Boolean {
         return jwtService.isTokenValid(token)
+    }
+
+    @GetMapping("/passport")
+    fun checkPassport(@RequestBody passportDto: PassportDto): CommonResponse<Boolean> {
+        if (passportDto.email == jwtService.decodeToken(passportDto.token)) {
+            return CommonResponse(true)
+        }
+        return CommonResponse(false)
     }
 
 }
