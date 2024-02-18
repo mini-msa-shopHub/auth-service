@@ -15,8 +15,12 @@ import org.springframework.web.bind.annotation.PatchMapping
 interface UserFeignClient {
 
     @GetMapping("/user-info")
-    fun getUserInfo(emailDto: EmailDto): CommonResponse<UserInfo>
+    fun getUserInfo(
+        emailDto: EmailDto
+    ): CommonResponse<UserInfo>
 
     @PatchMapping("/refresh-token")
-    fun updateRefreshToken(updateRefreshRequest: UpdateRefreshRequest): CommonResponse<EmptyDto>
+    fun updateRefreshToken(
+        updateRefreshRequest: UpdateRefreshRequest
+    ): CommonResponse<EmptyDto>
 }

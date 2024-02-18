@@ -9,12 +9,10 @@ import com.auth0.jwt.exceptions.TokenExpiredException
 import com.example.authservice.dto.TokenResponse
 import com.example.authservice.dto.UpdateRefreshRequest
 import com.example.authservice.feign.UserFeignClient
+import com.example.authservice.passport.IntegrityEncoder
 import jakarta.servlet.http.HttpServletRequest
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -52,7 +50,8 @@ class JwtService(
         val refreshToken = createRefreshToken()
         userFeignClient.updateRefreshToken(UpdateRefreshRequest(
             email = email,
-            refreshToken = refreshToken
+            refreshToken = refreshToken,
+            IntegrityEncoder.makePassport(email)
         ))
         return TokenResponse(accessToken, refreshToken, "")
     }
