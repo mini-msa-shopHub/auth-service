@@ -4,5 +4,5 @@ import com.example.authservice.passport.PassportDto
 
 data class EmailDto(
     val value: String,
-    val passportDto: PassportDto
+    val passportDto: PassportDto? = null
 )
