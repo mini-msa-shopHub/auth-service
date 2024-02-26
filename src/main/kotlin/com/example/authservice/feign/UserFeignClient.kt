@@ -4,7 +4,6 @@ import com.example.authservice.dto.EmailDto
 import com.example.authservice.dto.UpdateRefreshRequest
 import com.example.authservice.dto.UserInfo
 import com.example.authservice.util.CommonResponse
-import com.example.authservice.util.EmptyDto
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.GetMapping
@@ -22,5 +21,5 @@ interface UserFeignClient {
     @PatchMapping("/refresh-token")
     fun updateRefreshToken(
         updateRefreshRequest: UpdateRefreshRequest
-    ): CommonResponse<EmptyDto>
+    ): CommonResponse<UserInfo>
 }

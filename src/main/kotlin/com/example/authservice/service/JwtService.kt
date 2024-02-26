@@ -10,7 +10,6 @@ import com.example.authservice.dto.TokenResponse
 import com.example.authservice.dto.UpdateRefreshRequest
 import com.example.authservice.feign.UserFeignClient
 import com.example.authservice.passport.IntegrityEncoder
-import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -48,12 +47,14 @@ class JwtService(
     fun makeTokenResponse(email: String): TokenResponse {
         val accessToken = createAccessToken(email)
         val refreshToken = createRefreshToken()
-        userFeignClient.updateRefreshToken(UpdateRefreshRequest(
-            email = email,
-            refreshToken = refreshToken,
-            IntegrityEncoder.makePassport(email)
-        ))
-        return TokenResponse(accessToken, refreshToken, "")
+        val userInfo = userFeignClient.updateRefreshToken(
+            UpdateRefreshRequest(
+                email = email,
+                refreshToken = refreshToken,
+                IntegrityEncoder.makePassport(email)
+            )
+        ).result
+        return TokenResponse(accessToken, refreshToken, userInfo.userRole)
     }
 
     private fun createAccessToken(email: String): String {
@@ -81,13 +82,6 @@ class JwtService(
             .withExpiresAt(Date(now.time + TEN_MINUTE))
             .withClaim(EMAIL_CLAIM, email)
             .sign(Algorithm.HMAC512(secretKey))
-    }
-
-    fun extractToken(request: HttpServletRequest): String? {
-        val header = request.getHeader(JWT_TOKEN) ?: return null
-        return if (header.startsWith(BEARER)) {
-            header.replace(BEARER, "")
-        } else null
     }
 
     fun extractEmail(token: String?): String? {
